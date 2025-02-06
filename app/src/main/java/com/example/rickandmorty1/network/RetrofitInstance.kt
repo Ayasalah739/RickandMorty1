@@ -7,11 +7,12 @@ object RetrofitInstance {
 
     private const val BASE_URL = "https://rickandmortyapi.com/api/"
 
-    val apiService: ApiService by lazy {
-        Retrofit.Builder()
+    fun <T> create(service: Class<T>): T {
+        return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(ApiService::class.java)
+            .create(service)
     }
 }
+

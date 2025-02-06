@@ -1,10 +1,12 @@
 package com.example.rickandmorty1
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.rickandmorty1.databinding.ActivityMainBinding
+import com.example.rickandmorty1.ui.CharacterDetailActivity
 import com.example.rickandmorty1.ui.CharacterViewModel
 import com.example.rickandmorty1.ui.adapter.CharacterAdapter
 
@@ -26,15 +28,17 @@ class MainActivity : AppCompatActivity() {
 
         characterViewModel.characters.observe(this) { characters ->
             characters?.let {
-                if (binding.recyclerView.adapter == null) {
-                    binding.recyclerView.adapter = CharacterAdapter(it)
-                } else {
-                    (binding.recyclerView.adapter as CharacterAdapter).updateData(it)
+                binding.recyclerView.adapter = CharacterAdapter(it) { character ->
+                    val intent = Intent(this, CharacterDetailActivity::class.java).apply {
+                        putExtra("CHARACTER_ID", character.id)
+                    }
+                    startActivity(intent)
                 }
             }
         }
     }
 }
+
 
 
 
