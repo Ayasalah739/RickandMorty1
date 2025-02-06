@@ -1,0 +1,10 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.RickAndMorty1" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+        <item name="colorPrimary">#87D1DB</item>
+        <item name="colorPrimaryDark">#1C3042</item>
+        <item name="colorAccent">#99A5B3</item>
+    </style>
+</resources>
