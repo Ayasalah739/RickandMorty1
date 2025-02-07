@@ -5,14 +5,18 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.rickandmorty1.data.CharacterRepository
 import com.example.rickandmorty1.databinding.ActivityMainBinding
 import com.example.rickandmorty1.ui.CharacterDetailActivity
 import com.example.rickandmorty1.ui.CharacterViewModel
+import com.example.rickandmorty1.ui.CharacterViewModelFactory
 import com.example.rickandmorty1.ui.adapter.CharacterAdapter
 
 class MainActivity : AppCompatActivity() {
 
-    private val characterViewModel: CharacterViewModel by viewModels()
+    private val characterViewModel: CharacterViewModel by viewModels {
+        CharacterViewModelFactory(CharacterRepository())
+    }
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,21 +27,28 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
 
-        val linearLayoutManager = LinearLayoutManager(this)
-        binding.recyclerView.layoutManager = linearLayoutManager
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
 
         characterViewModel.characters.observe(this) { characters ->
             characters?.let {
-                binding.recyclerView.adapter = CharacterAdapter(it) { character ->
-                    val intent = Intent(this, CharacterDetailActivity::class.java).apply {
-                        putExtra("CHARACTER_ID", character.id)
-                    }
-                    startActivity(intent)
+                val adapter = CharacterAdapter(it) { character ->
+                    navigateToCharacterDetail(character.id)
                 }
+                binding.recyclerView.adapter = adapter
             }
         }
+
+        characterViewModel.fetchCharacters()
+    }
+
+    private fun navigateToCharacterDetail(characterId: Int) {
+        val intent = Intent(this, CharacterDetailActivity::class.java).apply {
+            putExtra("CHARACTER_ID", characterId)
+        }
+        startActivity(intent)
     }
 }
+
 
 
 

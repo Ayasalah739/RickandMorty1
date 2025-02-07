@@ -1,20 +1,21 @@
 package com.example.rickandmorty1.ui
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.example.rickandmorty1.R
+import com.example.rickandmorty1.data.CharacterRepository
 import com.example.rickandmorty1.databinding.ActivityCharacterDetailBinding
 import com.example.rickandmorty1.model.Character
-import com.example.rickandmorty1.network.ApiService
-import com.example.rickandmorty1.network.RetrofitInstance
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class CharacterDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCharacterDetailBinding
+
+    private val characterDetailViewModel: CharacterDetailViewModel by viewModels {
+        CharacterDetailViewModelFactory(CharacterRepository())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,24 +24,19 @@ class CharacterDetailActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val characterId = intent.getIntExtra("CHARACTER_ID", -1)
-
         if (characterId != -1) {
-
-            fetchCharacterDetails(characterId)
+            characterDetailViewModel.fetchCharacter(characterId)
         }
+
+        observeViewModel()
     }
 
-    private fun fetchCharacterDetails(characterId: Int) {
-        val apiService = RetrofitInstance.create(ApiService::class.java)
-
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val character = apiService.getCharacterDetails(characterId)
-                withContext(Dispatchers.Main) {
-                    updateUI(character)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+    private fun observeViewModel() {
+        characterDetailViewModel.character.observe(this) { character ->
+            character?.let {
+                updateUI(it)
+            } ?: run {
+                showErrorUI()
             }
         }
     }
@@ -50,6 +46,13 @@ class CharacterDetailActivity : AppCompatActivity() {
         binding.characterSpecies.text = character.species
         binding.characterStatus.text = character.status
         Picasso.get().load(character.image).into(binding.characterImage)
+    }
+
+    private fun showErrorUI() {
+        binding.characterName.text = getString(R.string.character_not_found)
+        binding.characterSpecies.text = ""
+        binding.characterStatus.text = ""
+        binding.characterImage.setImageResource(R.drawable.placeholder_image)
     }
 }
 

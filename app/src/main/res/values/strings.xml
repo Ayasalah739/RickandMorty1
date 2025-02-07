@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">RickandMorty1</string>
+    <string name="character_not_found">Character not found</string>
 </resources>
